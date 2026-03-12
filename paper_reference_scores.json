@@ -1,0 +1,27 @@
+# Methodology
+
+## Canonical representation
+
+Each artifact is represented as a set of canonical semantic claims `(subject, predicate, object, qualifiers)` plus confidence and evidence metadata.
+
+## Edge semantics
+
+Each traceability edge stores a `ClaimDelta` with:
+
+- `added`
+- `removed`
+- `modified`
+- `provenance`
+
+## Constraint evaluation
+
+A Semantic Integrity Constraint scopes attention to relevant predicates or subjects and evaluates whether a transition is satisfied, suspect, or a violation.
+
+## Hybrid scoring
+
+The implementation fuses:
+
+- a structured score over scoped claim differences, and
+- an embedding-based semantic divergence score over rendered summaries.
+
+The combined score is used for drift classification and explanation.

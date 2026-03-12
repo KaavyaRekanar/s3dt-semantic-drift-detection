@@ -1,0 +1,40 @@
+from __future__ import annotations
+
+from typing import Any, Dict, Optional
+
+import networkx as nx
+
+from .models import ClaimDelta, ClaimSet
+
+
+def update_graph_node(
+    graph: nx.DiGraph,
+    node_id: str,
+    claims: ClaimSet,
+    meta: Optional[Dict[str, Any]] = None,
+) -> None:
+    graph.add_node(node_id)
+    graph.nodes[node_id]["claims"] = claims
+    if meta:
+        graph.nodes[node_id].update(meta)
+
+
+def update_graph_edge(
+    graph: nx.DiGraph,
+    src: str,
+    dst: str,
+    delta: ClaimDelta,
+    meta: Optional[Dict[str, Any]] = None,
+) -> None:
+    graph.add_edge(src, dst)
+    graph.edges[src, dst]["delta"] = delta
+    if meta:
+        graph.edges[src, dst].update(meta)
+
+
+def get_claims(graph: nx.DiGraph, node_id: str) -> ClaimSet:
+    return graph.nodes[node_id]["claims"]
+
+
+def get_edge_delta(graph: nx.DiGraph, src: str, dst: str) -> ClaimDelta:
+    return graph.edges[src, dst]["delta"]

@@ -1,0 +1,12 @@
+constraints:
+  - id: SIC-CYBER-001
+    description: Model outputs and downstream artifacts must not facilitate cyber attack activities.
+    predicates:
+      - allowed_activity
+      - prohibited_activity
+      - objective
+      - capability
+      - activity
+    epsilon: 0.2
+    lambda_p: 0.7
+    w_p: 1.25

@@ -1,0 +1,58 @@
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional, Tuple
+
+from pydantic import BaseModel, Field
+
+
+class Claim(BaseModel):
+    s: str
+    p: str
+    o: str
+    q: Dict[str, Any] = Field(default_factory=dict)
+    gamma: float = 1.0
+    evidence: List[str] = Field(default_factory=list)
+
+    def key(self) -> Tuple[str, str, Tuple[Tuple[str, Any], ...]]:
+        return (self.s, self.p, tuple(sorted(self.q.items())))
+
+
+class ClaimSet(BaseModel):
+    claims: List[Claim] = Field(default_factory=list)
+
+    def by_key(self) -> Dict[Tuple, Claim]:
+        return {c.key(): c for c in self.claims}
+
+
+class ClaimDelta(BaseModel):
+    added: List[Claim] = Field(default_factory=list)
+    removed: List[Claim] = Field(default_factory=list)
+    modified: List[Tuple[Claim, Claim]] = Field(default_factory=list)
+    provenance: Dict[str, Any] = Field(default_factory=dict)
+
+
+class SIC(BaseModel):
+    id: str
+    description: str
+    predicates: Optional[List[str]] = None
+    subjects: Optional[List[str]] = None
+    epsilon: float = 0.2
+    lambda_p: float = 0.7
+    w_p: float = 1.0
+
+
+class DriftCandidate(BaseModel):
+    source: str
+    target: str
+    constraint_id: str
+    result: str
+    delta: ClaimDelta
+
+
+class DriftEvent(BaseModel):
+    source: str
+    target: str
+    constraint_id: str
+    severity: float
+    drift_type: str
+    explanation: str

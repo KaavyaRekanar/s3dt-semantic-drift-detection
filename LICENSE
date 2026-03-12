@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: "Semantic Integrity as a Security Primitive: Detecting Drift in Digital Threads with LLM-Assisted Semantic Analysis"
+message: "If you use this repository, please cite the paper and the software artifact."
+type: software
+authors:
+  - family-names: Rekanar
+    given-names: Kaavya
+  - family-names: O'Shea
+    given-names: Donna
+year: 2026
+license: Apache-2.0
+repository-code: "https://github.com/<your-org>/semantic-integrity-digital-threads"
+abstract: "Research artifact for the S3DT framework for detecting semantic drift across digital threads using canonical claims, semantic deltas, graph-based drift detection, and hybrid scoring."
+keywords:
+  - digital threads
+  - semantic drift detection
+  - software lifecycle security
+  - AI system security
+  - semantic integrity constraints
+  - traceability graph analysis

@@ -1,0 +1,193 @@
+# Semantic Integrity as a Security Primitive: Detecting Drift in Digital Threads with LLM-Assisted Semantic Analysis
+
+This repository accompanies the ACM CCS submission **"Semantic Integrity as a Security Primitive: Detecting Drift in Digital Threads with LLM-Assisted Semantic Analysis"**. It provides a research artifact for the **S3DT framework** (**Secure Semantic Soundness for Digital Threads**) and a reproducible case-study package centered on the 2025 Anthropic AI-orchestrated cyber-espionage incident discussed in the paper. The artifact operationalizes the paper's core idea that **semantic integrity** can be treated as a security primitive by monitoring meaning-level inconsistencies across linked lifecycle artifacts rather than assessing each artifact in isolation.
+
+## Repository contents
+
+- A reference Python implementation of Algorithms 1-3 from the paper.
+- A clear implementation-oriented description of the S3DT framework.
+- A bundled case-study reconstruction for the Anthropic 2025 incident.
+- A hybrid semantic drift scoring pipeline with CLI entry points.
+- Example outputs and paper-reference drift scores for artifact comparison.
+- Suggested academic artifact packaging for ACM CCS submission and evaluation.
+
+## S3DT framework overview
+
+The S3DT framework is organized around three algorithms and a semantically enriched digital-thread graph.
+
+### Stage 1: Semantic projection and delta construction
+
+Artifacts are normalized and transformed into canonical semantic claims. Claim sets are aligned across traceability links and converted into a `ClaimDelta` containing added, removed, and modified claims plus provenance.
+
+### Stage 2: Constraint-based drift detection
+
+The semantically enriched digital-thread graph is traversed edge by edge. For each transition and each applicable Semantic Integrity Constraint (SIC), scoped claim sets and scoped deltas are evaluated to determine whether the transition is `SATISFIED`, `SUSPECT`, or `VIOLATION`. When the result is `SUSPECT` or `VIOLATION`, a `DriftCandidate` is emitted and passed to the scoring stage.
+
+### Stage 3: Hybrid scoring, classification, and explanation
+
+The scoring stage combines two signals:
+
+1. a structured component derived from the scoped semantic delta, and
+2. an embedding-based component derived from summaries of the scoped claim sets.
+
+The final score is a convex fusion of normalized structured drift and calibrated embedding divergence.
+
+## Repository layout
+
+```text
+semantic-integrity-digital-threads/
+├── README.md
+├── LICENSE
+├── CITATION.cff
+├── pyproject.toml
+├── requirements.txt
+├── .gitignore
+├── artifacts/
+│   └── case_studies/
+│       └── anthropic_2025/
+│           ├── README.md
+│           ├── thread_graph.json
+│           ├── constraints.yaml
+│           └── expected_outputs/
+│               ├── paper_drift_scores.csv
+│               └── paper_drift_scores.json
+├── docs/
+│   ├── artifact_overview.md
+│   ├── methodology.md
+│   ├── reproducibility.md
+│   └── case_study_anthropic_2025.md
+├── scripts/
+│   ├── run_case_study.py
+│   ├── run_pipeline.py
+│   └── export_example_outputs.py
+├── src/
+│   └── s3dt/
+│       ├── __init__.py
+│       ├── models.py
+│       ├── graph.py
+│       ├── projection.py
+│       ├── detection.py
+│       ├── scoring.py
+│       ├── pipeline.py
+│       └── cli.py
+└── tests/
+    └── test_pipeline.py
+```
+
+## Installation
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
+
+### Dependencies
+
+The implementation uses `networkx`, `pydantic`, `numpy`, and optionally `sentence-transformers` for Algorithm 3. The artifact also includes `PyYAML` for loading case-study constraints from YAML.
+
+## Reproducing the case study package
+
+The bundled case study reconstructs a digital thread for an AI-enabled cyber-espionage campaign using the artifact sequence:
+
+`policy -> agent -> scripts -> runtime`
+
+### 1. Run the hybrid scoring pipeline on the bundled case study
+
+```bash
+python scripts/run_case_study.py \
+  --case-dir artifacts/case_studies/anthropic_2025 \
+  --output-dir results/anthropic_2025
+```
+
+This command loads the case-study thread graph and constraint file, applies Algorithms 1-3, and writes machine-readable outputs under `results/anthropic_2025/`.
+
+### 2. Export the paper-reference outputs
+
+```bash
+python scripts/export_example_outputs.py \
+  --case-dir artifacts/case_studies/anthropic_2025 \
+  --output-dir results/anthropic_2025_reference
+```
+
+This writes the expected drift score table reported in the paper for direct artifact comparison.
+
+### 3. Inspect the generated results
+
+Expected output files:
+
+- `events.json`
+- `events.csv`
+- `summary.md`
+- `paper_reference_scores.json`
+- `paper_reference_scores.csv`
+
+## Paper-reference drift scores
+
+For the reconstructed Anthropic thread, the paper reports the following hybrid drift scores:
+
+| Transition | Hybrid score |
+|---|---:|
+| Policy -> Agent | 0.22 |
+| Agent -> Scripts | 0.54 |
+| Scripts -> Runtime | 0.70 |
+
+These values are bundled into `artifacts/case_studies/anthropic_2025/expected_outputs/` as the comparison baseline for artifact evaluation.
+
+## Using the implementation
+
+### Run the general pipeline
+
+```bash
+python scripts/run_pipeline.py \
+  --thread artifacts/case_studies/anthropic_2025/thread_graph.json \
+  --constraints artifacts/case_studies/anthropic_2025/constraints.yaml \
+  --output-dir results/pipeline_run
+```
+
+### Python API
+
+```python
+import json
+from s3dt.pipeline import run_pipeline
+
+with open("artifacts/case_studies/anthropic_2025/thread_graph.json", "r", encoding="utf-8") as f:
+    thread = json.load(f)
+
+events = run_pipeline(
+    thread_graph=thread,
+    constraints_path="artifacts/case_studies/anthropic_2025/constraints.yaml",
+)
+
+for event in events:
+    print(event.constraint_id, event.source, event.target, event.severity)
+```
+
+## Implementation notes
+
+This repository restructures the uploaded notebook into importable Python modules. The code is intentionally close to the notebook implementation so the mapping from paper algorithm to artifact code remains clear.
+
+To improve artifact portability, the repository includes an offline-safe lexical fallback for embedding distance when `sentence-transformers` is unavailable locally. This fallback keeps the artifact runnable in restricted environments; for closest alignment with the notebook, install `sentence-transformers` and use the default `all-MiniLM-L6-v2` embedder.
+
+## Licensing recommendation
+
+For academic code, two strong choices are:
+
+- **Apache-2.0** when you want an explicit patent grant and clearer contributor protection.
+- **MIT** when you want a very minimal permissive license.
+
+This starter repository uses **Apache-2.0** as the default because research code is often reused in follow-on systems work and the explicit patent language is helpful. Repository text and documentation can additionally be dual-marked as `CC BY 4.0` in the paper or release notes if desired.
+
+## Suggestions for future contributions
+
+- Add more case studies beyond the Anthropic reconstruction.
+- Replace the placeholder structured score with richer risk weighting over predicate type, confidence, and provenance.
+- Extend SIC evaluation with domain-specific constraint languages.
+- Add calibrated model cards and environment-lock files for stronger ACM artifact reproducibility.
+- Support dynamic or streaming digital-thread updates for near-real-time semantic integrity monitoring.
+- Add benchmark datasets for semantic drift detection across software supply chains, cloud infrastructure, and safety-critical systems.
+
+## Citation
+
+Please cite the paper and, if useful for software reuse, cite this repository through the included `CITATION.cff` file.

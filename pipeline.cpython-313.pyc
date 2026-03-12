@@ -1,0 +1,58 @@
+from __future__ import annotations
+
+from typing import Any, Dict, Tuple
+
+import networkx as nx
+
+from .graph import update_graph_edge, update_graph_node
+from .models import Claim, ClaimDelta, ClaimSet
+
+
+def normalize_artifact(artifact: Dict[str, Any]) -> Dict[str, Any]:
+    """Treat the input dictionary as already normalized."""
+    return artifact
+
+
+def semantic_claims(v_norm: Dict[str, Any]) -> ClaimSet:
+    claims = [Claim(**c) for c in v_norm.get("claims", [])]
+    return ClaimSet(claims=claims)
+
+
+def align_and_diff(Ci: ClaimSet, Cj: ClaimSet) -> ClaimDelta:
+    mi, mj = Ci.by_key(), Cj.by_key()
+    keys_i, keys_j = set(mi.keys()), set(mj.keys())
+
+    added = [mj[k] for k in sorted(keys_j - keys_i)]
+    removed = [mi[k] for k in sorted(keys_i - keys_j)]
+    modified = []
+    for k in sorted(keys_i & keys_j):
+        old, new = mi[k], mj[k]
+        if old.o != new.o:
+            modified.append((old, new))
+    return ClaimDelta(added=added, removed=removed, modified=modified)
+
+
+def attach_provenance(delta: ClaimDelta, e_ij: Dict[str, Any]) -> ClaimDelta:
+    delta.provenance = dict(e_ij)
+    return delta
+
+
+def ProjectAndAnnotateThreadEdge(
+    G: nx.DiGraph,
+    a_i: Dict[str, Any],
+    a_j: Dict[str, Any],
+    e_ij: Dict[str, Any],
+    node_i: str,
+    node_j: str,
+) -> Tuple[str, str, ClaimDelta]:
+    """Algorithm 1: semantic projection engine."""
+    v_i = normalize_artifact(a_i)
+    v_j = normalize_artifact(a_j)
+    C_i = semantic_claims(v_i)
+    C_j = semantic_claims(v_j)
+    delta_ij = align_and_diff(C_i, C_j)
+    delta_ij = attach_provenance(delta_ij, e_ij)
+    update_graph_node(G, node_i, C_i, meta={"artifact_meta": v_i.get("meta", {})})
+    update_graph_node(G, node_j, C_j, meta={"artifact_meta": v_j.get("meta", {})})
+    update_graph_edge(G, node_i, node_j, delta_ij, meta={"link_meta": e_ij})
+    return node_i, node_j, delta_ij

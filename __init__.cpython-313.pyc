@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Run the bundled Anthropic 2025 case study")
+    parser.add_argument("--case-dir", required=True)
+    parser.add_argument("--output-dir", required=True)
+    args = parser.parse_args()
+
+    case_dir = Path(args.case_dir)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    subprocess.run(
+        [
+            sys.executable,
+            "scripts/run_pipeline.py",
+            "--thread",
+            str(case_dir / "thread_graph.json"),
+            "--constraints",
+            str(case_dir / "constraints.yaml"),
+            "--output-dir",
+            str(output_dir),
+        ],
+        check=True,
+    )
+
+    subprocess.run(
+        [
+            sys.executable,
+            "scripts/export_example_outputs.py",
+            "--case-dir",
+            str(case_dir),
+            "--output-dir",
+            str(output_dir),
+        ],
+        check=True,
+    )
+
+
+if __name__ == "__main__":
+    main()
