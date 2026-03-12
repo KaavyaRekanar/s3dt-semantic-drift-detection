@@ -1,5 +1,9 @@
 # Semantic Integrity as a Security Primitive: Detecting Drift in Digital Threads with LLM-Assisted Semantic Analysis
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1DMaBiSmrhppG3b84emw-TSZc6jpk67hS#scrollTo=KSGa_UX7A8-r)
+
+# Semantic Integrity as a Security Primitive: Detecting Drift in Digital Threads with LLM-Assisted Semantic Analysis
+
 This repository accompanies the ACM CCS submission **"Semantic Integrity as a Security Primitive: Detecting Drift in Digital Threads with LLM-Assisted Semantic Analysis"**. It provides a research artifact for the **S3DT framework** (**Secure Semantic Soundness for Digital Threads**) and a reproducible case-study package centered on the 2025 Anthropic AI-orchestrated cyber-espionage incident discussed in the paper. The artifact operationalizes the paper's core idea that **semantic integrity** can be treated as a security primitive by monitoring meaning-level inconsistencies across linked lifecycle artifacts rather than assessing each artifact in isolation.
 
 ## Repository contents
@@ -34,7 +38,6 @@ The final score is a convex fusion of normalized structured drift and calibrated
 
 ## Repository layout
 
-```text
 semantic-integrity-digital-threads/
 ├── README.md
 ├── LICENSE
@@ -42,6 +45,7 @@ semantic-integrity-digital-threads/
 ├── pyproject.toml
 ├── requirements.txt
 ├── .gitignore
+│
 ├── artifacts/
 │   └── case_studies/
 │       └── anthropic_2025/
@@ -51,15 +55,25 @@ semantic-integrity-digital-threads/
 │           └── expected_outputs/
 │               ├── paper_drift_scores.csv
 │               └── paper_drift_scores.json
+│
 ├── docs/
 │   ├── artifact_overview.md
 │   ├── methodology.md
 │   ├── reproducibility.md
 │   └── case_study_anthropic_2025.md
+│
+├── notebooks/
+│   └── s3dt_anthropic_2025_case_study.ipynb
+│
+├── figures/
+│   ├── drift_progression.png
+│   └── case_study.png
+│
 ├── scripts/
 │   ├── run_case_study.py
 │   ├── run_pipeline.py
 │   └── export_example_outputs.py
+│
 ├── src/
 │   └── s3dt/
 │       ├── __init__.py
@@ -70,9 +84,9 @@ semantic-integrity-digital-threads/
 │       ├── scoring.py
 │       ├── pipeline.py
 │       └── cli.py
+│
 └── tests/
     └── test_pipeline.py
-```
 
 ## Installation
 
