@@ -1,119 +1,239 @@
-{
-  "case_id": "anthropic_2025",
-  "title": "Anthropic 2025 AI-orchestrated cyber-espionage case study",
-  "artifacts": [
-    {
-      "id": "policy",
-      "meta": {"name": "Model Safety Policy", "stage": "policy"},
-      "claims": [
-        {
-          "s": "ClaudeCode",
-          "p": "allowed_activity",
-          "o": "benign_assistance_only",
-          "q": {"scope": "cyber"},
-          "gamma": 0.98,
-          "evidence": ["policy:1"]
-        },
-        {
-          "s": "ClaudeCode",
-          "p": "prohibited_activity",
-          "o": "credential_harvesting_and_exfiltration",
-          "q": {"scope": "cyber"},
-          "gamma": 0.99,
-          "evidence": ["policy:2"]
-        }
-      ]
-    },
-    {
-      "id": "agent",
-      "meta": {"name": "Agent Interaction", "stage": "agent"},
-      "claims": [
-        {
-          "s": "ClaudeCode",
-          "p": "allowed_activity",
-          "o": "task_orchestration",
-          "q": {"scope": "cyber"},
-          "gamma": 0.92,
-          "evidence": ["agent:1"]
-        },
-        {
-          "s": "AgentWorkflow",
-          "p": "objective",
-          "o": "automated_target_enumeration",
-          "q": {"stage": "planning"},
-          "gamma": 0.90,
-          "evidence": ["agent:2"]
-        }
-      ]
-    },
-    {
-      "id": "scripts",
-      "meta": {"name": "Generated Scripts", "stage": "scripts"},
-      "claims": [
-        {
-          "s": "GeneratedScripts",
-          "p": "capability",
-          "o": "reconnaissance_and_vulnerability_discovery",
-          "q": {"stage": "execution_prep"},
-          "gamma": 0.96,
-          "evidence": ["scripts:1"]
-        },
-        {
-          "s": "GeneratedScripts",
-          "p": "objective",
-          "o": "credential_collection_pathways",
-          "q": {"stage": "execution_prep"},
-          "gamma": 0.95,
-          "evidence": ["scripts:2"]
-        }
-      ]
-    },
-    {
-      "id": "runtime",
-      "meta": {"name": "Runtime Activity", "stage": "runtime"},
-      "claims": [
-        {
-          "s": "ObservedRuntime",
-          "p": "activity",
-          "o": "credential_harvesting",
-          "q": {"stage": "runtime"},
-          "gamma": 0.99,
-          "evidence": ["runtime:1"]
-        },
-        {
-          "s": "ObservedRuntime",
-          "p": "activity",
-          "o": "data_exfiltration",
-          "q": {"stage": "runtime"},
-          "gamma": 0.99,
-          "evidence": ["runtime:2"]
-        },
-        {
-          "s": "ObservedRuntime",
-          "p": "activity",
-          "o": "backdoor_creation",
-          "q": {"stage": "runtime"},
-          "gamma": 0.97,
-          "evidence": ["runtime:3"]
-        }
-      ]
-    }
-  ],
-  "edges": [
-    {
-      "source": "policy",
-      "target": "agent",
-      "meta": {"type": "traceability", "description": "policy to agent invocation"}
-    },
-    {
-      "source": "agent",
-      "target": "scripts",
-      "meta": {"type": "traceability", "description": "agent to generated scripts"}
-    },
-    {
-      "source": "scripts",
-      "target": "runtime",
-      "meta": {"type": "traceability", "description": "generated scripts to runtime activity"}
-    }
-  ]
-}
+# Case Study: Detecting Semantic Drift in an AI-Orchestrated Attack Pipeline
+
+This case study demonstrates how the **S³DT framework (Secure Semantic Soundness for Digital Threads)** can detect semantic drift across artifacts within a complex system lifecycle.
+
+The objective of this case study is to illustrate how lifecycle artifacts can diverge semantically and how S³DT detects such inconsistencies using digital thread analysis.
+
+---
+
+# 1. Scenario Overview
+
+Recent reports have documented the emergence of **AI-assisted cyber operations**, where attackers use automated agents to:
+
+- perform reconnaissance
+- discover vulnerabilities
+- generate exploit scripts
+- harvest credentials
+- exfiltrate data
+
+These attacks often involve **multiple stages of artifact generation**, including:
+
+- policy specifications
+- agent prompts
+- generated code
+- execution scripts
+- runtime activity logs
+
+Each artifact individually appears legitimate, but across the lifecycle they may introduce **security-relevant inconsistencies**.
+
+This case study reconstructs such a scenario as a **digital thread** and analyzes it using the S³DT framework.
+
+---
+
+# 2. Digital Thread Reconstruction
+
+The attack pipeline is represented as a sequence of lifecycle artifacts connected through traceability relationships.
+
+Example digital thread:
+Security Policy
+↓
+Agent Configuration
+↓
+Generated Script
+↓
+Execution Environment
+↓
+Runtime Logs
+
+
+Each stage introduces a new artifact that reflects system behavior at a specific point in the lifecycle.
+
+These artifacts are ingested into the S³DT framework and transformed into semantic representations.
+
+---
+
+# 3. Artifact Collection
+
+The following artifacts were modeled in the reconstructed digital thread:
+
+### Policy Artifacts
+
+Security policy describing expected system behavior.
+
+Example: Sensitive data must not be exfiltrated outside the organization.
+
+---
+
+### Agent Configuration
+
+Configuration defining the capabilities of an automated agent.
+
+Example: Agent can scan network services and generate scripts for testing vulnerabilities.
+
+
+---
+
+### Generated Script
+
+Code generated by an automated system or AI agent.
+
+Example:
+scan_network()
+extract_credentials()
+upload_results(remote_server)
+
+
+---
+
+### Execution Environment
+
+System configuration used during script execution.
+
+Example:
+
+- network access enabled
+- outbound connections allowed
+- logging enabled
+
+---
+
+### Runtime Logs
+
+Observed runtime behavior of the system.
+
+Example:connection established to external host
+data upload completed
+
+
+---
+
+# 4. Semantic Projection
+
+Each artifact is transformed into a set of **semantic claims**.
+
+Example claim format: (subject, predicate, object)
+
+Example claims extracted from artifacts:
+
+Policy artifact: (data_transfer, allowed_destination, internal_only)
+
+Generated script: (script, transfers_data_to, external_server)
+
+Runtime log: (runtime_event, data_uploaded_to, remote_host)
+
+
+These claims enable comparison across artifacts with different formats.
+
+---
+
+# 5. Digital Thread Graph
+
+After semantic projection, artifacts are represented as nodes in a **digital thread graph**. G = (V, E)
+
+Where:
+
+- `V` represents artifact nodes
+- `E` represents lifecycle transitions between artifacts
+
+Each edge contains a **semantic delta**, describing the change in meaning between artifacts.
+
+Example transition: Policy → Generated Script
+
+Delta: internal_only → external_server
+
+This represents a potential **policy violation**.
+
+---
+
+# 6. Drift Detection
+
+The S³DT framework evaluates **Semantic Integrity Constraints (SICs)** across each transition in the digital thread.
+
+Example constraint: Data transfer destinations must remain internal.
+
+When evaluating the transition: Policy → Generated Script
+
+The framework detects a semantic change: allowed_destination: internal_only
+→
+transfers_data_to: external_server
+
+This change triggers a **drift candidate**.
+
+---
+
+# 7. Drift Classification
+
+Detected drift events are analyzed using hybrid scoring.
+
+Two signals are considered:
+
+### Structured semantic differences
+
+Differences between claim sets across artifacts.
+
+### Embedding-based semantic divergence
+
+Latent semantic shifts between artifact summaries.
+
+The combined drift score determines whether the event is classified as:
+
+- benign evolution
+- suspicious drift
+- security violation
+
+---
+
+# 8. Example Drift Event
+
+Detected drift event:
+Source artifact: Security policy
+Target artifact: Generated script
+Constraint: Data residency policy
+Result: VIOLATION
+
+
+Explanation generated by S³DT:
+
+> The generated script introduces data transfer to an external server, violating the policy requiring data to remain internal.
+
+This explanation is traceable to the underlying semantic claims.
+
+---
+
+# 9. Security Implications
+
+This case study demonstrates that lifecycle-level inconsistencies can introduce security risks even when individual artifacts appear valid.
+
+The S³DT framework enables detection of such issues by:
+
+- analyzing semantic relationships across artifacts
+- enforcing explicit integrity constraints
+- providing explainable drift detection
+
+This approach supports improved lifecycle security monitoring in complex software systems.
+
+---
+
+# 10. Key Takeaways
+
+The case study highlights three important observations:
+
+1. Security failures may arise from **cross-artifact inconsistencies**, not just individual vulnerabilities.
+
+2. Lifecycle artifacts must be analyzed **collectively rather than independently**.
+
+3. Semantic drift detection can reveal security issues before they manifest as runtime attacks.
+
+The S³DT framework provides a mechanism for performing this analysis at scale across digital threads.
+
+
+
+
+
+
+
+
+
+
+
+
